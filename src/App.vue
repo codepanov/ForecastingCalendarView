@@ -18,7 +18,8 @@ export default {
 <style>
 /* set the inactive (disabled) arrow color */
 :root {
-  --arrow-color: red;
+  --arrow-base-color: #555;
+  --arrow-stop-color: red;
 }
 body {
   background: #21252B;

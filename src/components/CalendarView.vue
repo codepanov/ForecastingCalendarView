@@ -90,8 +90,14 @@ export default {
       position: {},
       booking_data: {},
 
-      // server data | comes from response as a prop
-      months: ["October", "November", "December"], // [[], [], []]
+      // server data | from response
+      months: ["October", "November", "December"],
+      /**
+       * by switching months BE can send this structure, as we see it now,
+       * and sequentially change it for every month (request/response)
+       * or
+       * send all months at once, in a structure like this: [[], [], []]
+       */
       dates: ["01/10", "02/10", "03/10", "04/10"],
       inventories: [
         {
@@ -129,8 +135,8 @@ export default {
       this.hidden_modal = false;
       const element_dimensions = e.target.getBoundingClientRect();
       this.position = Object.assign({}, this.position, {
-        x_position: element_dimensions.top,
-        y_position: element_dimensions.left + element_dimensions.width / 2,
+        x_position: element_dimensions.left + element_dimensions.width / 2,
+        y_position: element_dimensions.top,
       });
       this.booking_data = booking;
     },
@@ -139,6 +145,7 @@ export default {
     },
   },
   mounted() {
+    // reacting to event from LeftRight.vue component, which is sending index of a current month
     this.$root.$on("month-change", (payload) => {
       console.log(payload);
     });

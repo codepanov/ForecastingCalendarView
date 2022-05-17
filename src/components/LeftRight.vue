@@ -74,7 +74,7 @@ export default {
   width: 0;
   height: 0;
   border-top: 10px solid transparent;
-  border-right: 15px solid #555;
+  border-right: 15px solid var(--arrow-base-color);
   border-bottom: 10px solid transparent;
   /* margin-right: 15px; */
   cursor: pointer;
@@ -83,7 +83,7 @@ export default {
   width: 0;
   height: 0;
   border-top: 10px solid transparent;
-  border-left: 15px solid #555;
+  border-left: 15px solid var(--arrow-base-color);
   border-bottom: 10px solid transparent;
   /* margin-left: 15px; */
   cursor: pointer;
@@ -96,11 +96,11 @@ export default {
 }
 /* set the color within the variable in App.vue */
 .lr-left-stop {
-  border-right-color: var(--arrow-color);
+  border-right-color: var(--arrow-stop-color);
   cursor: not-allowed;
 }
 .lr-right-stop {
-  border-left-color: var(--arrow-color);
+  border-left-color: var(--arrow-stop-color);
   cursor: not-allowed;
 }
 .lr-hide {
