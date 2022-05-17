@@ -16,6 +16,10 @@ export default {
 </script>
 
 <style>
+/* set the inactive (disabled) arrow color */
+:root {
+  --arrow-color: red;
+}
 body {
   background: #21252B;
 }

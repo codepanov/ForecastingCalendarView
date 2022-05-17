@@ -10,48 +10,65 @@
         <div>
           <!-- Change Month, left, right -->
           <div class="tbl-month">
-            <span>October</span>
+            <LeftRight :months="months" />
+            <!-- <span>October</span> -->
           </div>
-          <!-- Dates area | number of dates must match number of squares in Squares area -->
+          <!-- Table Date -->
           <div class="tbl-dates-row">
-            <div class="tbl-date child">01/10</div>
-            <div class="tbl-date child">02/10</div>
+            <div v-for="(date, i) in dates" :key="i" class="tbl-date child">
+              {{ date }}
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Table Date -->
+      <!-- Inventories -->
       <div class="tbl-data">
         <div class="tbl-inventory-data">
           <ul>
-            <li>
-              <!-- Inventory name -->
-              <span class="tbl-inventory-name child">Left part</span>
-              <!-- Squares area -->
-              <span class="sp-right child border-left tbl-squares-row">
-                <div class="tbl-square">&#9829;</div>
-                <div class="tbl-square">&#9829;</div>
-              </span>
-            </li>
-            <li>
-              <!-- Inventory name -->
-              <span class="tbl-inventory-name child">Left part</span>
-              <!-- Squares area -->
-              <span class="sp-right child border-left tbl-squares-row">
-                <div class="tbl-square">&#9829;</div>
-                <div class="tbl-square">&#9829;</div>
-              </span>
-            </li>
-            <li>
-              <!-- Inventory name -->
-              <span class="tbl-inventory-name child">Left part</span>
-              <!-- Squares area -->
-              <span class="sp-right child border-left tbl-squares-row">
-                <div class="tbl-square">&#9829;</div>
-                <div class="tbl-square">&#9829;</div>
-              </span>
-            </li>
+            <!-- Inventory list-->
+            <template v-for="(inv, i) in inventories">
+              <!-- Inventory placement name -->
+              <li :key="i">
+                <span class="tbl-inventory-name tbl-placement child">{{
+                  inv.placement
+                }}</span>
+                <span class="tbl-squares-row border-left child">
+                  <div class="table-square"></div>
+                </span>
+              </li>
+              <!-- Inventory media name -->
+              <li v-for="media in inv.media" :key="media.name">
+                <span class="tbl-inventory-name tbl-indent child">{{
+                  media.name
+                }}</span>
+                <!-- Square icon -->
+                <span class="tbl-squares-row border-left child">
+                  <div
+                    v-for="(booking, index) in media.bookings"
+                    :key="index"
+                    class="tbl-square"
+                    :class="{
+                      'tbl-green': booking === 0,
+                      'tbl-orange': booking === 1,
+                      'tbl-purple': booking === 2,
+                    }"
+                  >
+                    <span
+                      @mouseover="modalPositionAndData($event, booking)"
+                      @mouseout="resetModal()"
+                      >&#9829;</span
+                    >
+                  </div>
+                </span>
+              </li>
+            </template>
           </ul>
+          <InfoModal
+            :position="position"
+            :booking_data="booking_data"
+            :hidden="hidden_modal"
+          />
         </div>
       </div>
     </div>
@@ -59,43 +76,72 @@
 </template>
 
 <script>
+import LeftRight from "./LeftRight";
+import InfoModal from "./InfoModal";
+
 export default {
+  components: {
+    LeftRight,
+    InfoModal,
+  },
   data() {
     return {
+      hidden_modal: true,
+      position: {},
+      booking_data: {},
+
+      // server data | comes from response as a prop
+      months: ["October", "November", "December"], // [[], [], []]
       dates: ["01/10", "02/10", "03/10", "04/10"],
       inventories: [
         {
           placement: "Academic Psyhiatry 40596h1",
-          media_names: [
-            "s1 SCH 53003 SCO 26000",
-            "h2 SCH 53003 SCO 26000",
-            "c1 SCH 53003 SCO 26000",
-            "c2 SCH 53003 SCO 26000",
-          ],
-          bookings: [
-            0,
-            0,
-            1,
-            2, // can be 0, 1 or 2
+          media: [
+            // booking can be 0, 1 or 2
+            { name: "s1 SCH 53003 SCO 26000", bookings: [0, 0, 1, 2] },
+            { name: "h2 SCH 53003 SCO 26000", bookings: [0, 1, 1, 2] },
+            { name: "c1 SCH 53003 SCO 26000", bookings: [0, 0, 0, 1] },
+            { name: "c2 SCH 53003 SCO 26000", bookings: [1, 0, 2, 0] },
           ],
           /**
            * Green  #8CD183 - represents placements with 0 bookings
            * Orange #FF5300 - represents placements with 1 campaign booked on them
-           * Purple  #7837E6 - represents placements with 1 or more  campaigns booked on them
+           * Purple  #7837E6 - represents placements with 1 or more campaigns booked on them
+           *
+           * !!! We always see one month of data? Will pagination relate to that to?
+           * !!! TAG explanation needed!
            */
         },
         {
           placement: "Academic Questions 12129",
-          media_names: [
-            "h1 SCO 36000 SCO 38000",
-            "h2 SCO 36000 SCO 38000",
-            "c1 SCO 36000 SCO 38000",
-            "c2 SCO 36000 SCO 38000",
+          media: [
+            { name: "h1 SCO 36000 SCO 38000", bookings: [1, 2, 1, 0] },
+            { name: "h2 SCO 36000 SCO 38000", bookings: [0, 1, 2, 0] },
+            { name: "c1 SCO 36000 SCO 38000", bookings: [1, 0, 0, 1] },
+            { name: "c2 SCO 36000 SCO 38000", bookings: [2, 0, 1, 2] },
           ],
-          bookings: [1, 2, 1, 1],
         },
       ],
     };
+  },
+  methods: {
+    modalPositionAndData(e, booking) {
+      this.hidden_modal = false;
+      const element_dimensions = e.target.getBoundingClientRect();
+      this.position = Object.assign({}, this.position, {
+        x_position: element_dimensions.top,
+        y_position: element_dimensions.left + element_dimensions.width / 2,
+      });
+      this.booking_data = booking;
+    },
+    resetModal() {
+      this.hidden_modal = true;
+    },
+  },
+  mounted() {
+    this.$root.$on("month-change", (payload) => {
+      console.log(payload);
+    });
   },
 };
 </script>
@@ -119,6 +165,11 @@ export default {
 
 .tbl-header-left {
   width: 20%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+  /* border: 1px solid yellow; */
 }
 .tbl-header-right {
   width: 80%;
@@ -136,26 +187,11 @@ export default {
 }
 .tbl-inventory-data {
   width: 100%;
+  /* border: 1px solid yellow; */
 }
 
-.sp-right {
-  width: 80%;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-li {
-  display: flex;
-}
-
-.border-bottom {
-  border-bottom: 1px solid green;
-}
-.border-left {
-  border-left: 1px solid green;
+.tbl-placement {
+  font-weight: bold;
 }
 
 .tbl-dates-row {
@@ -172,11 +208,44 @@ li {
 }
 
 .tbl-squares-row {
+  width: 80%;
   display: flex;
   align-items: center;
 }
 .tbl-square {
-  color: red;
   flex-grow: 1;
+}
+.tbl-square span:hover {
+  color: aqua;
+  cursor: pointer;
+}
+/* colors */
+.tbl-green {
+  color: #8CD183;
+}
+.tbl-orange {
+  color: #FF5300;
+}
+.tbl-purple {
+  color: #7837E6;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+li {
+  display: flex;
+}
+.tbl-indent {
+  text-indent: 20px;
+}
+
+.border-bottom {
+  border-bottom: 1px solid green;
+}
+.border-left {
+  border-left: 1px solid green;
 }
 </style>
