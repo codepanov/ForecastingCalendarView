@@ -28,24 +28,24 @@
           <ul>
             <!-- Inventory list-->
             <template v-for="(inv, i) in inventories">
-              <!-- Inventory placement name -->
+              <!-- Inventory media name -->
               <li :key="i">
-                <span class="tbl-inventory-name tbl-placement child">{{
-                  inv.placement
+                <span class="tbl-inventory-name tbl-media child">{{
+                  inv.media
                 }}</span>
                 <span class="tbl-squares-row border-left child">
                   <div class="table-square"></div>
                 </span>
               </li>
-              <!-- Inventory media name -->
-              <li v-for="media in inv.media" :key="media.name">
+              <!-- Inventory placement name -->
+              <li v-for="placement in inv.placement" :key="placement.name">
                 <span class="tbl-inventory-name tbl-indent child">{{
-                  media.name
+                  placement.name
                 }}</span>
                 <!-- Square icon -->
                 <span class="tbl-squares-row border-left child">
                   <div
-                    v-for="(booking, index) in media.bookings"
+                    v-for="(booking, index) in placement.bookings"
                     :key="index"
                     class="tbl-square"
                     :class="{
@@ -57,8 +57,9 @@
                     <span
                       @mouseover="modalPositionAndData($event, booking)"
                       @mouseout="resetModal()"
-                      >&#9829;</span
                     >
+                      &#9829;
+                    </span>
                   </div>
                 </span>
               </li>
@@ -89,9 +90,10 @@ export default {
       hidden_modal: true,
       position: {},
       booking_data: {},
+      modal_locked: false,
 
       // server data | from response
-      months: ["October", "November", "December"],
+      months: ["October", "November", "December"], // dobijem iz moment.js
       /**
        * by switching months BE can send this structure, as we see it now,
        * and sequentially change it for every month (request/response)
@@ -101,8 +103,8 @@ export default {
       dates: ["01/10", "02/10", "03/10", "04/10"],
       inventories: [
         {
-          placement: "Academic Psyhiatry 40596h1",
-          media: [
+          media: "Academic Psyhiatry 40596h1",
+          placement: [
             // booking can be 0, 1 or 2
             { name: "s1 SCH 53003 SCO 26000", bookings: [0, 0, 1, 2] },
             { name: "h2 SCH 53003 SCO 26000", bookings: [0, 1, 1, 2] },
@@ -112,15 +114,15 @@ export default {
           /**
            * Green  #8CD183 - represents placements with 0 bookings
            * Orange #FF5300 - represents placements with 1 campaign booked on them
-           * Purple  #7837E6 - represents placements with 1 or more campaigns booked on them
+           * Purple  #7837E6 - represents placements with more campaigns booked on them
            *
            * !!! We always see one month of data? Will pagination relate to that to?
            * !!! TAG explanation needed!
            */
         },
         {
-          placement: "Academic Questions 12129",
-          media: [
+          media: "Academic Questions 12129",
+          placement: [
             { name: "h1 SCO 36000 SCO 38000", bookings: [1, 2, 1, 0] },
             { name: "h2 SCO 36000 SCO 38000", bookings: [0, 1, 2, 0] },
             { name: "c1 SCO 36000 SCO 38000", bookings: [1, 0, 0, 1] },
@@ -197,7 +199,7 @@ export default {
   /* border: 1px solid yellow; */
 }
 
-.tbl-placement {
+.tbl-media {
   font-weight: bold;
 }
 
@@ -221,6 +223,7 @@ export default {
 }
 .tbl-square {
   flex-grow: 1;
+  /* border: 1px solid yellow; */
 }
 .tbl-square span:hover {
   color: aqua;

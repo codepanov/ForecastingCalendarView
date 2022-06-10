@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="info-modal" :class="{ hidden: hidden }" ref="info-modal">
-      <div class="im-cloud" ref="im-cloud"></div>
+      <div class="im-cloud" ref="im-cloud">
+        {{ booking_data }}
+      </div>
       <div class="im-tip"></div>
     </div>
   </div>
@@ -13,14 +15,15 @@ export default {
   watch: {
     position() {
       const info_modal = this.$refs["info-modal"];
-      const im_cloud = this.$refs["im-cloud"];
       const dimensions = info_modal.getBoundingClientRect();
 
       info_modal.style.left =
         this.position.x_position - dimensions.width / 2 + "px";
       info_modal.style.top =
         this.position.y_position - dimensions.height + "px";
-      im_cloud.innerText = this.booking_data;
+    },
+    booking_data() {
+      return this.booking_data;
     },
   },
 };
@@ -44,6 +47,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
 .im-tip {
   width: 0;
@@ -54,5 +58,8 @@ export default {
 }
 .hidden {
   visibility: hidden;
+}
+.data {
+  cursor: pointer;
 }
 </style>
